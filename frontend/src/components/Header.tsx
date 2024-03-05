@@ -1,8 +1,18 @@
 import Link from "next/link";
 import MobileNav from "./MobileNav";
 import MainNav from "./MainNav";
+import createUser from "../../hooks/User";
+import { getSession } from "@auth0/nextjs-auth0";
 
-const Header = () => {
+const Header = async () => {
+  const session = await getSession();
+  const user = session?.user;
+  if (user) {
+    await createUser({
+      auth0Id: user.sub,
+      email: user.email,
+    });
+  }
   return (
     <div className="border-b-2 border-b-primary py-6">
       <div className="container mx-auto flex justify-between items-center">

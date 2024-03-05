@@ -1,4 +1,5 @@
 import React from "react";
+import { getSession } from "@auth0/nextjs-auth0";
 import {
   Sheet,
   SheetContent,
@@ -9,8 +10,12 @@ import {
 import { Menu } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function MobileNav() {
+export default async function MobileNav() {
+  const session = await getSession();
+  const user = session?.user;
   return (
     <div>
       <Sheet>
@@ -19,11 +24,38 @@ export default function MobileNav() {
         </SheetTrigger>
         <SheetContent className="space-y-3">
           <SheetTitle>
-            <span className="">Welcome to HungryEats</span>
+            {user ? (
+              <div className="flex justify-center items-center gap-4">
+                <Avatar>
+                  <AvatarImage src={user?.picture} className="text-center" />
+                  <AvatarFallback>{user?.name}</AvatarFallback>
+                </Avatar>
+                <p>{user?.name}</p>
+              </div>
+            ) : (
+              <p className="text-center">Welcome to HungryEats</p>
+            )}
           </SheetTitle>
           <Separator />
-          <SheetDescription className="flex">
-            <Button className="flex-1 font-bold bg-primary">Log In</Button>
+          <SheetDescription>
+            {user ? (
+              <div className="w-full flex flex-col gap-2">
+                <Link href="/user-profile">
+                  <Button className="w-full">Profile</Button>
+                </Link>
+                <Link href="/api/auth/logout" className="w-full">
+                  <Button className="flex-1 font-bold bg-primary w-full">
+                    Log out
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <Link href="/api/auth/login" className="w-full">
+                <Button className="flex-1 font-bold bg-primary w-full">
+                  Log In
+                </Button>
+              </Link>
+            )}
           </SheetDescription>
         </SheetContent>
       </Sheet>
